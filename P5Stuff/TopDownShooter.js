@@ -20,7 +20,7 @@ function draw(){
 		spawnEnemies(round * 5);
 		round++;
 	}
-	
+
   background(backgroundColor);
   gamePlayer.move();
   gamePlayer.show();
@@ -80,8 +80,8 @@ class Enemy {
     //position
 		this.randomNum = Math.floor(Math.random() * 2);
 		console.log(this.randomNum);
-		this.speed = Math.random() * random(2, 4);
-		
+		this.speed = Math.random() * random(2, 4sd);
+
 		if(this.randomNum == 0){
 			this.pos = new createVector(0,random(windowHeight));
 		}
@@ -89,11 +89,11 @@ class Enemy {
 			this.pos = new createVector(random(windowWidth), 0);
 		}
   }
-	
+
 	kill(){
 		gameEnemies.splice(gameEnemies.indexOf(this), 1);
 	}
-	
+
   move(){
 		this.dir = new createVector((gamePlayer.pos.x - this.pos.x), (gamePlayer.pos.y - this.pos.y)).normalize();
 		this.newDir = new createVector(this.dir.x * this.speed, this.dir.y * this.speed);
@@ -149,7 +149,7 @@ class Player {
         this.isMovingForward = true;
       }
     }
-		
+
     if(keyPressed.key == "a"){
       if(this.isMovingLeft){
         this.isMovingLeft = false;
@@ -164,7 +164,7 @@ class Player {
         this.isMovingBack = true;
       }
     }
-		
+
     if(keyPressed.key == "d"){
       if(this.isMovingRight){
         this.isMovingRight = false;
@@ -294,7 +294,7 @@ class Particle {
       gameParticles.splice(gameParticles.indexOf(this), 1);
     }
   }
-	
+
 }
 
 function drawUI(){
