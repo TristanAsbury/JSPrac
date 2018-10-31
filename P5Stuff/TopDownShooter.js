@@ -1,9 +1,14 @@
-let backgroundColor;
-let gamePlayer;
-let gameBullets = [];
-let gameParticles = [];
+var backgroundColor;
+var gamePlayer;
+
+var gameEnemies = [];
+var round;
+
+var gameBullets = [];
+var gameParticles = [];
 
 function setup(){
+	round = 0;
   textAlign(CENTER);
   gamePlayer = new Player();
   createCanvas(windowWidth, windowHeight);
@@ -11,6 +16,11 @@ function setup(){
 }
 
 function draw(){
+	if(gameEnemies.length == 0){ //spawn enemies
+		spawnEnemies(round * 5);
+		round++;
+	}
+	
   background(backgroundColor);
   gamePlayer.move();
   gamePlayer.show();
@@ -22,7 +32,19 @@ function draw(){
     gameParticles[p].move();
     gameParticles[p].show();
   }
+	for(e = 0; e < gameEnemies.length; e++){
+		gameEnemies[e].move();
+		gameEnemies[e].show();
+	}
   drawUI();
+}
+
+function spawnEnemies(amount){
+	console.log("Spawning enemies " + amount);
+	this.enemyCount = amount;
+	for(i = 0; i < this.enemyCount; i++){
+		gameEnemies.push(new Enemy());
+	}
 }
 
 function windowResized(){
@@ -49,7 +71,6 @@ function mouseReleased(){
   gamePlayer.updateGun();
 }
 
-
 class Enemy {
 
   constructor(){
@@ -57,18 +78,35 @@ class Enemy {
     this.health = this.level * 7.25;
 
     //position
-    this.pos = new createVector()
+		this.randomNum = Math.floor(Math.random() * 4);
+		console.log(this.randomNum);
+		this.speed = Math.random() * 11;
+		
+		if(this.randomNum == 0){
+			this.pos = new createVector(0,0);
+		}
+		if(this.randomNum == 1){
+			this.pos = new createVector(windowWidth, 0);
+		}
+		if(this.randomNum == 2){
+			this.pos = new createVector(0, windowHeight);
+		}
+		if(this.randomNum == 3){
+			this.pos = new createVector(windowWidth, windowHeight);
+		}
   }
 
   move(){
+		this.pos.add(new createVector((gamePlayer.pos.x - this.pos.x), (gamePlayer.pos.y - this.pos.y)).normalize());
   }
-
-
 
   show(){
+		push();
+		stroke(0,0,0);
+		fill(200, 20, 10);
     ellipse(this.pos.x, this.pos.y, 15, 15);
+		pop();
   }
-
 }
 
 class Player {
@@ -89,10 +127,10 @@ class Player {
     //gun and combat booleans
     this.isFiring = false;
     this.timeSinceLastShot = 0;
-    this.shootInterval = 0.1; //this could be replaced with gun fire rat variable from gun picked up
-    this.magSize = 3000; //could be replaced with gun magazine size from gun picked up
+    this.shootInterval = 2; //this could be replaced with gun fire rat variable from gun picked up
+    this.magSize = 100; //could be replaced with gun magazine size from gun picked up
     this.ammo = this.magSize; //could be set to the gun [picked up] max mag size
-    this.reloadTime = 90; //could be set to reload speed of gun picked up
+    this.reloadTime = 70; //could be set to reload speed of gun picked up
     this.reloadedTime = 0;
 
     //movement data
@@ -111,6 +149,7 @@ class Player {
         this.isMovingForward = true;
       }
     }
+		
     if(keyPressed.key == "a"){
       if(this.isMovingLeft){
         this.isMovingLeft = false;
@@ -125,6 +164,7 @@ class Player {
         this.isMovingBack = true;
       }
     }
+		
     if(keyPressed.key == "d"){
       if(this.isMovingRight){
         this.isMovingRight = false;
@@ -249,11 +289,15 @@ class Particle {
       gameParticles.splice(gameParticles.indexOf(this), 1);
     }
   }
+	
 }
 
 function drawUI(){
   textAlign(CENTER);
   textSize(24);
+	push();
+	fill(0);
+	pop();
   if(gamePlayer.isReloading){
     text("Ammo: RELOADING", windowWidth/2, windowHeight - 30);
   } else {
