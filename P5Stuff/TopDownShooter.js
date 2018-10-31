@@ -1,6 +1,7 @@
 let backgroundColor;
 let gamePlayer;
 let gameBullets = [];
+let gameParticles = [];
 
 function setup(){
   textAlign(CENTER);
@@ -16,6 +17,10 @@ function draw(){
   for(b = 0; b < gameBullets.length; b++){ //move and show bullets
     gameBullets[b].move();
     gameBullets[b].show();
+  }
+  for(p = 0; p < gameParticles.length; p++){
+    gameParticles[p].move();
+    gameParticles[p].show();
   }
   drawUI();
 }
@@ -58,7 +63,7 @@ class Enemy {
   move(){
   }
 
-  
+
 
   show(){
     ellipse(this.pos.x, this.pos.y, 15, 15);
@@ -113,14 +118,14 @@ class Player {
         this.isMovingLeft = true;
       }
     }
-    if(keyPressed.key === "s"){
+    if(keyPressed.key == "s"){
       if(this.isMovingBack){
         this.isMovingBack = false;
       } else {
         this.isMovingBack = true;
       }
     }
-    if(keyPressed.key === "d"){
+    if(keyPressed.key == "d"){
       if(this.isMovingRight){
         this.isMovingRight = false;
       } else {
@@ -189,7 +194,7 @@ class Player {
 
 class Bullet {
 
-  constructor(originEntity, dir){
+  constructor(originEntity, dir, isParticle){
     this.lifeTime = 0;
     this.maxLifeTime = 70;
     this.pos = new createVector(originEntity.x, originEntity.y);
@@ -207,12 +212,43 @@ class Bullet {
     noStroke();
     fill(0);
     ellipse(this.pos.x, this.pos.y, 8, 8);
+
     this.lifeTime++;
     if(this.lifeTime >= this.maxLifeTime){
+      for(var p = 0; p < 10; p++){ //create particles
+        gameParticles.push(new Particle(this, color(237, random(76,197), random(45,67))));
+      }
       gameBullets.splice(gameBullets.indexOf(this), 1);
     }
+
   }
 
+}
+
+class Particle {
+  constructor(originEntity, color){
+    this.pos = new createVector(originEntity.pos.x, originEntity.pos.y);
+    this.dir = new createVector(random(-3, 3), random(-3, 3));
+    this.color = color;
+    this.lifeTime = 0;
+    this.maxLifeTime = random(10, 50);
+  }
+
+  move(){
+    this.pos.add(this.dir);
+  }
+
+  show(){
+    push();
+    noStroke();
+    fill(this.color)
+    ellipse(this.pos.x, this.pos.y, 5, 5);
+    pop();
+    this.lifeTime++;
+    if(this.lifeTime >= this.maxLifeTime){
+      gameParticles.splice(gameParticles.indexOf(this), 1);
+    }
+  }
 }
 
 function drawUI(){
