@@ -80,7 +80,7 @@ class Enemy {
     //position
 		this.randomNum = Math.floor(Math.random() * 2);
 		console.log(this.randomNum);
-		this.speed = Math.random() * random(2, 4sd);
+		this.speed = Math.random() * random(2, 4);
 		
 		if(this.randomNum == 0){
 			this.pos = new createVector(0,random(windowHeight));
