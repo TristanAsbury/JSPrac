@@ -78,26 +78,26 @@ class Enemy {
     this.health = this.level * 7.25;
 
     //position
-		this.randomNum = Math.floor(Math.random() * 4);
+		this.randomNum = Math.floor(Math.random() * 2);
 		console.log(this.randomNum);
-		this.speed = Math.random() * 11;
+		this.speed = Math.random() * random(2, 4sd);
 		
 		if(this.randomNum == 0){
-			this.pos = new createVector(0,0);
+			this.pos = new createVector(0,random(windowHeight));
 		}
 		if(this.randomNum == 1){
-			this.pos = new createVector(windowWidth, 0);
-		}
-		if(this.randomNum == 2){
-			this.pos = new createVector(0, windowHeight);
-		}
-		if(this.randomNum == 3){
-			this.pos = new createVector(windowWidth, windowHeight);
+			this.pos = new createVector(random(windowWidth), 0);
 		}
   }
-
+	
+	kill(){
+		gameEnemies.splice(gameEnemies.indexOf(this), 1);
+	}
+	
   move(){
-		this.pos.add(new createVector((gamePlayer.pos.x - this.pos.x), (gamePlayer.pos.y - this.pos.y)).normalize());
+		this.dir = new createVector((gamePlayer.pos.x - this.pos.x), (gamePlayer.pos.y - this.pos.y)).normalize();
+		this.newDir = new createVector(this.dir.x * this.speed, this.dir.y * this.speed);
+		this.pos.add(this.newDir);
   }
 
   show(){
@@ -254,6 +254,11 @@ class Bullet {
     ellipse(this.pos.x, this.pos.y, 8, 8);
 
     this.lifeTime++;
+		for(e = 0; e < gameEnemies.length; e++){
+			if(dist(gameEnemies[e].pos.x, gameEnemies[e].pos.y, this.pos.x, this.pos.y) < 10){
+				gameEnemies[e].kill();
+			}
+		}
     if(this.lifeTime >= this.maxLifeTime){
       for(var p = 0; p < 10; p++){ //create particles
         gameParticles.push(new Particle(this, color(237, random(76,197), random(45,67))));
