@@ -40,7 +40,6 @@ function draw(){
 }
 
 function spawnEnemies(amount){
-	console.log("Spawning enemies " + amount);
 	this.enemyCount = amount;
 	for(i = 0; i < this.enemyCount; i++){
 		gameEnemies.push(new Enemy());
@@ -62,36 +61,43 @@ function keyReleased(e){
 
 //For combat
 function mousePressed(){
-  console.log("Mouse Down!");
   gamePlayer.updateGun();
 }
 
 function mouseReleased(){
-  console.log("Mouse Up!");
   gamePlayer.updateGun();
 }
 
 class Enemy {
 
   constructor(){
-    this.level = random(1, gamePlayer.level);
+    this.level = Math.round(random(1, gamePlayer.level));
     this.health = this.level * 7.25;
 
     //position
 		this.randomNum = Math.floor(Math.random() * 2);
-		console.log(this.randomNum);
-		this.speed = Math.random() * random(2, 4sd);
+		this.speed = random(2, 4);
 
 		if(this.randomNum == 0){
 			this.pos = new createVector(0,random(windowHeight));
 		}
+
 		if(this.randomNum == 1){
 			this.pos = new createVector(random(windowWidth), 0);
 		}
   }
 
+	hurt(dmg){
+		if((this.health - dmg) <= 0){
+			this.kill();
+		} else {
+			this.health -= dmg;
+		}
+	}
+
 	kill(){
 		gameEnemies.splice(gameEnemies.indexOf(this), 1);
+		gamePlayer.xp += Math.round(this.level * 25);
 	}
 
   move(){
@@ -119,7 +125,7 @@ class Player {
     this.isMovingRight = false;
 
     //player data
-    this.level = 0;
+    this.level = 1;
     this.xp = 0;
     this.xpCap = 100;
     this.health = 100;
@@ -140,6 +146,14 @@ class Player {
     this.vertSmooth = new createVector(0, 0.1);
     this.horSmooth = new createVector(0.1, 0);
   }
+
+	checkXP(){
+		if(this.xp >= this.xpCap){
+			this.xp = this.xp - this.xpCap;
+			this.xpCap = Math.round(this.xpCap * 1.25);
+			this.level++;
+		}
+	}
 
   updateMovement(keyPressed){
     if(keyPressed.key == "w"){
@@ -222,6 +236,7 @@ class Player {
   }
 
   show(){ //simply draws the player at its pos
+		this.checkXP();
     push();
     fill(0);
     strokeWeight(3);
@@ -235,6 +250,7 @@ class Player {
 class Bullet {
 
   constructor(originEntity, dir, isParticle){
+		this.dmg = 10;
     this.lifeTime = 0;
     this.maxLifeTime = 70;
     this.pos = new createVector(originEntity.x, originEntity.y);
@@ -256,7 +272,7 @@ class Bullet {
     this.lifeTime++;
 		for(e = 0; e < gameEnemies.length; e++){
 			if(dist(gameEnemies[e].pos.x, gameEnemies[e].pos.y, this.pos.x, this.pos.y) < 10){
-				gameEnemies[e].kill();
+				gameEnemies[e].hurt(this.dmg);
 			}
 		}
     if(this.lifeTime >= this.maxLifeTime){
@@ -308,6 +324,8 @@ function drawUI(){
   } else {
     text("Ammo: " + gamePlayer.ammo + " / " + gamePlayer.magSize, windowWidth/2, windowHeight - 30);
   }
+	text("Level: " + gamePlayer.level, 100, windowHeight - 30);
+	text("XP: " + gamePlayer.xp + " / " + gamePlayer.xpCap, 250, windowHeight - 30);
 }
 
 function normalize(originalVector){
