@@ -76,7 +76,7 @@ class Enemy {
 
     //position
 		this.randomNum = Math.floor(Math.random() * 2);
-		this.speed = random(2, 4);
+		this.speed = random(1, 3);
 
 		if(this.randomNum == 0){
 			this.pos = new createVector(0,random(windowHeight));
@@ -250,6 +250,7 @@ class Player {
 class Bullet {
 
   constructor(originEntity, dir, isParticle){
+		this.size = 5;
 		this.dmg = 10;
     this.lifeTime = 0;
     this.maxLifeTime = 70;
@@ -268,7 +269,6 @@ class Bullet {
     noStroke();
     fill(0);
     ellipse(this.pos.x, this.pos.y, 8, 8);
-
     this.lifeTime++;
 		for(e = 0; e < gameEnemies.length; e++){
 			if(dist(gameEnemies[e].pos.x, gameEnemies[e].pos.y, this.pos.x, this.pos.y) < 10){
@@ -288,22 +288,25 @@ class Bullet {
 
 class Particle {
   constructor(originEntity, color){
+		this.size = 10;
     this.pos = new createVector(originEntity.pos.x, originEntity.pos.y);
     this.dir = new createVector(random(-3, 3), random(-3, 3));
     this.color = color;
     this.lifeTime = 0;
     this.maxLifeTime = random(10, 50);
-  }
+  	this.sizeDec = this.size / this.maxLifeTime;
+	}
 
   move(){
     this.pos.add(this.dir);
   }
 
   show(){
+		this.size -= this.sizeDec;
     push();
     noStroke();
     fill(this.color)
-    ellipse(this.pos.x, this.pos.y, 5, 5);
+    ellipse(this.pos.x, this.pos.y, this.size, this.size);
     pop();
     this.lifeTime++;
     if(this.lifeTime >= this.maxLifeTime){
